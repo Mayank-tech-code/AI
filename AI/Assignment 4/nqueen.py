@@ -1,88 +1,42 @@
-# NQueen Algorithm - Assignment 4
+print ("Enter the number of queens")
+N = int(input())
 
-def satisfy_constraints(board, constraints, n, n_queens):
-    c1, c2 = constraints
-    for col1 in range(n):
-        if (isSafe(board, c1, col1, n)):
-            board[c1][col1] = "Q"
-            # print("?????????",board)
-            for col2 in range(n):
-                if (isSafe(board, c2, col2, n)):
-                    board[c2][col2] = "Q"
-                    # print(board)
-                    fill_board(board, constraints, 0, n, n_queens-2)
-                    board[c2][col2] = ""
-            board[c1][col1] = ""
+#chessboard
+#NxN matrix with all elements 0
+board = [[0]*N for _ in range(N)]
 
+def is_attack(i, j):
+    #checking if there is a queen in row or column
+    for k in range(0,N):
+        if board[i][k]==1 or board[k][j]==1:
+            return True
+    #checking diagonals
+    for k in range(0,N):
+        for l in range(0,N):
+            if (k+l==i+j) or (k-l==i-j):
+                if board[k][l]==1:
+                    return True
+    return False
 
-def fill_board(board, constraints, row, n, n_queens):
-    # print(n_queens)
-    if (n_queens == 0):
-        print(*board, sep="\n")
-        print("=================================")
-        return
-    if (row == n):
-        return
-    if row in constraints:
-        return fill_board(board, constraints, row+1, n, n_queens)
-    for col in range(n):
-        if (isSafe(board, row, col, n)):
-            board[row][col] = 'Q'
-            fill_board(board, constraints, row+1, n, n_queens-1)
-            board[row][col] = ''
-    fill_board(board, constraints, row+1, n, n_queens)
+def N_queen(n):
+    #if n is 0, solution found
+    if n==0:
+        return True
+    for i in range(0,N):
+        for j in range(0,N):
+            '''checking if we can place a queen here or not
+            queen will not be placed if the place is being attacked
+            or already occupied'''
+            if (not(is_attack(i,j))) and (board[i][j]!=1):
+                board[i][j] = 1
+                #recursion
+                #wether we can put the next queen with this arrangment or not
+                if N_queen(n-1)==True:
+                    return True
+                board[i][j] = 0
 
+    return False
 
-def isSafe(board, row, col, n):
-    # return True
-    for j in range(n):
-        if (board[row][j] == 'Q'):
-            return False
-    for i in range(n):
-        if (board[i][col] == 'Q'):
-            return False
-
-    i = row+1
-    j = col+1
-    while (i < n and j < n):
-        if (board[i][j] == 'Q'):
-            return False
-        i += 1
-        j += 1
-
-    i = row-1
-    j = col-1
-    while (i >= 0 and j >= 0):
-        if (board[i][j] == 'Q'):
-            return False
-        i -= 1
-        j -= 1
-
-    i = row+1
-    j = col-1
-    while (i < n and j >= 0):
-        if (board[i][j] == 'Q'):
-            return False
-        i += 1
-        j -= 1
-
-    i = row-1
-    j = col+1
-    while (i >= 0 and j < n):
-        if (board[i][j] == 'Q'):
-            return False
-        i -= 1
-        j += 1
-
-    return True
-
-
-n = 5  # board size
-n_queens = 3  # number of queens to be placed
-c1 = 1        # constraint-1 must be betwwen [0,n-1]
-c2 = 2        # constraint-2 must be betwwen [0,n-1]
-
-lst = []
-for i in range(n):
-    lst.append([""]*n)
-satisfy_constraints(lst, (c1, c2), n, n_queens)
+N_queen(N)
+for i in board:
+    print (i)
